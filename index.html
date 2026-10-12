@@ -315,12 +315,13 @@ function renderDays(){
   <div class="day-head" onclick="this.parentElement.classList.toggle('collapsed')">
    <div class="row" style="justify-content:space-between;align-items:flex-start"><div><div class="daynum">יום ${d.n} · ${d.dow} ${d.date}</div><h3>${d.title}</h3><div class="muted">לינה: ${d.overnight}</div></div><span class="pill">פתח / סגור</span></div>
   </div>
-  <div class="day-body"><p>${d.summary}</p>
-   ${d.field?`<div class="field-note"><div class="field-title">📍 ${d.field.title}</div>${d.field.items.map(x=>`<p>${x}</p>`).join('')}${d.field.footer?`<div class="field-footer">${d.field.footer}</div>`:''}</div>`:''}
+  <div class="day-body">
    <div>${d.slots.map(s=>`<div class="schedule"><div class="slot">${s[0]}</div><div>${s[1]}</div></div>`).join('')}</div>
    <div class="row" style="margin:13px 0"><a class="btn small" target="_blank" href="${mapsUrl(d.route)}">🗺️ מסלול ב‑Google Maps</a><span class="pill">🏨 ${d.overnight}</span></div>
    <h4 style="margin-bottom:6px">תחנות במסלול</h4>
    ${d.stops.map((s)=>`<div class="checkrow"><span><b>${s}</b><span class="stopdesc">${stopInfo[s] || ''}</span><a class="muted stopmap" target="_blank" href="${searchUrl(s)}">פתח במפה</a></span></div>`).join('')}
+   <p>${d.summary}</p>
+   ${d.field?`<div class="field-note"><div class="field-title">📍 ${d.field.title}</div>${d.field.items.map(x=>`<p>${x}</p>`).join('')}${d.field.footer?`<div class="field-footer">${d.field.footer}</div>`:''}</div>`:''}
   </div>
  </article>`).join('');
 }
