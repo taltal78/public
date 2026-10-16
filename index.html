@@ -115,6 +115,7 @@ textarea{min-height:74px;resize:vertical}
 <div class="card">
 <div class="row" style="justify-content:space-between"><div><div class="label">עד הטיול</div><div class="countdown" id="countdown">—</div></div><div class="pill" id="todayPill">🗓 מתעדכן אוטומטית</div></div>
 <div id="todayBox" style="margin-top:14px"></div>
+<div class="row" style="margin-top:14px"><a class="btn" href="#days">📅 תכנית וסיכום כל הימים</a></div>
 </div>
 <div class="card">
 <h2>✈️ טיסות — לפי הכרטיסים האלקטרוניים שהונפקו 04.10</h2>
@@ -341,7 +342,7 @@ function renderDays(){
  const c=document.getElementById('daysContainer');
  c.innerHTML=days.map(d=>`<article class="card day-card" id="day-${d.n}">
   <div class="day-head" onclick="this.parentElement.classList.toggle('collapsed')">
-   <div class="row" style="justify-content:space-between;align-items:flex-start"><div><div class="daynum">יום ${d.n} · ${d.dow} ${d.date}</div><h3>${d.title}</h3><div class="muted">לינה: ${d.overnight}</div></div><span class="pill">פתח / סגור</span></div>
+   <div class="row" style="justify-content:space-between;align-items:flex-start"><div><div class="daynum">יום ${d.n} · ${d.dow} ${d.date}</div><h3>${d.title}</h3><div class="muted">לינה: ${d.overnight}</div><a class="muted stopmap" href="#day-${d.n}" onclick="event.stopPropagation()">🔗 קישור ישיר ליום</a></div><span class="pill">פתח / סגור</span></div>
   </div>
   <div class="day-body">
    <div>${d.slots.map(s=>`<div class="schedule"><div class="slot">${s[0]}</div><div>${s[1]}</div></div>`).join('')}</div>
@@ -377,9 +378,32 @@ function updateToday(){
   const n=Math.min(8,Math.floor((now-start)/msDay)+1); const d=days[n-1]; cd.textContent=`יום ${n} מתוך 8`; pill.textContent=`📍 ${d.title}`; box.innerHTML=`<b>${d.dow} ${d.date}</b><p style="margin:5px 0 10px">${d.summary}</p><button class="btn small" onclick="showPage('days');setTimeout(()=>document.getElementById('day-${n}').scrollIntoView({behavior:'smooth'}),100)">פתח את היום</button>`;
  }
 }
-function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.target===id));window.scrollTo({top:0,behavior:'smooth'})}
+function showPage(id,updateHash=true){
+ const target=document.getElementById(id)?id:'home';
+ document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===target));
+ document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.target===target));
+ if(updateHash){
+  const hash='#'+target;
+  if(location.hash!==hash) history.pushState(null,'',hash);
+ }
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+function openFromHash(){
+ const raw=decodeURIComponent(location.hash.replace(/^#/,''));
+ if(/^day-[1-8]$/.test(raw)){
+  showPage('days',false);
+  setTimeout(()=>{
+   const el=document.getElementById(raw);
+   if(el){el.classList.remove('collapsed');el.scrollIntoView({behavior:'smooth',block:'start'});}
+  },80);
+  return;
+ }
+ if(['home','days','maps','bookings','prep'].includes(raw)) showPage(raw,false);
+ else if(!raw) showPage('days',false);
+}
 document.querySelectorAll('.navbtn').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.target)));
-renderDays();renderRoutes();renderPrep();loadSaved();updateToday();
+window.addEventListener('hashchange',openFromHash);
+renderDays();renderRoutes();renderPrep();loadSaved();updateToday();openFromHash();
 </script>
 </body>
 </html>
